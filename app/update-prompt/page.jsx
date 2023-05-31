@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Form from "@components/Form";
 
@@ -15,7 +14,7 @@ const EditPrompt = () => {
 
   useEffect(() => {
     const getPromptDetails = async () => {
-      const response = await fetch(`/api/prompt/${prompt.id}`);
+      const response = await fetch(`/api/prompt/${promptId}`);
       const data = await response.json();
 
       setPost({
@@ -27,16 +26,17 @@ const EditPrompt = () => {
     if (promptId) getPromptDetails();
   }, [promptId]);
 
-  const createPrompt = async (e) => {
+  const updatePrompt = async (e) => {
     e.preventDefault();
     setSubmitting(true);
 
+    if (!promptId) return alert("Missing PromptId!");
+
     try {
-      const response = await fetch("/api/prompt/new", {
-        method: "POST",
+      const response = await fetch(`/api/prompt/${promptId}`, {
+        method: "PATCH",
         body: JSON.stringify({
           prompt: post.prompt,
-          userId: session?.user.id,
           tag: post.tag,
         }),
       });
@@ -57,7 +57,7 @@ const EditPrompt = () => {
       post={post}
       setPost={setPost}
       submitting={submitting}
-      handleSubmit={() => {}}
+      handleSubmit={updatePrompt}
     />
   );
 };
